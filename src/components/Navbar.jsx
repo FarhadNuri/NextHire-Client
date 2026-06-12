@@ -1,9 +1,16 @@
 'use client';
 import { useState } from "react";
-
+import { useSession, signOut } from "@/lib/auth-client";
+import Link from "next/link";
+import { Button } from "@heroui/react";
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const {data:session, isPending} = useSession()
+  console.log(session, isPending)
+  const user = session?.user 
+  const handleSignOut = async () => {
+    await signOut();
+  }
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#111111]/80 backdrop-blur-lg">
       <header className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
@@ -52,20 +59,29 @@ function Navbar() {
           <div className="mx-3 h-5 w-px bg-white/20" />
 
           {/* Sign In */}
-          <a
-            href="#"
+{          
+  user ? (
+    <>
+    Hi, {user.name}!
+    <Button variant="ghost" onClick={handleSignOut}>Sign Out</Button></>
+  ) :
+  <>
+  <Link
+            href="/auth/signin"
             className="px-3 py-1.5 text-sm font-medium text-violet-400 transition-colors hover:text-violet-300"
           >
             Sign In
-          </a>
+          </Link>
 
           {/* Get Started CTA */}
-          <a
-            href="#"
+          <Link
+            href="/auth/signup"
             className="ml-1 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#111111] transition-all hover:bg-white/90 active:scale-95"
           >
             Get Started
-          </a>
+          </Link>
+  </>
+}
         </div>
 
         {/* Mobile hamburger */}
@@ -128,20 +144,31 @@ function Navbar() {
               </a>
             </li>
             <li className="mt-1 border-t border-white/10 pt-3">
-              <a
-                href="#"
-                className="block rounded-lg px-3 py-2.5 text-sm font-medium text-violet-400 transition-colors hover:bg-white/10 hover:text-violet-300"
-              >
-                Sign In
-              </a>
-            </li>
-            <li className="mt-1">
-              <a
-                href="#"
-                className="block w-full rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#111111] transition-all hover:bg-white/90"
-              >
-                Get Started
-              </a>
+              {user ? (
+                <>
+                  <div className="block rounded-lg px-3 py-2.5 text-sm font-medium text-white">
+                    Hi, {user.name}!
+                  </div>
+                  <Button variant="ghost" className="w-full mt-2">
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/signin"
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-violet-400 transition-colors hover:bg-white/10 hover:text-violet-300"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="block w-full mt-2 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#111111] transition-all hover:bg-white/90"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </li>
           </ul>
         </div>
